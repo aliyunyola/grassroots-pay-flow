@@ -146,7 +146,7 @@ const Receipt = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Amount</span>
-                    <span className="font-bold text-lg text-success">${transaction.amount}</span>
+                    <span className="font-bold text-lg text-success">₦{transaction.amount}</span>
                   </div>
                   {transaction.description && (
                     <div>

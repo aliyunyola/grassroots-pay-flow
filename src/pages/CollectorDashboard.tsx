@@ -209,7 +209,7 @@ const CollectorDashboard = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Total Amount</span>
-                    <span className="font-semibold text-success">$1,240.00</span>
+                    <span className="font-semibold text-success">₦1,240.00</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">SMS Sent</span>

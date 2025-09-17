@@ -104,7 +104,7 @@ const AdminDashboard = () => {
               <DollarSign className="h-4 w-4 text-success" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-success">${totalAmount.toFixed(2)}</div>
+              <div className="text-2xl font-bold text-success">₦{totalAmount.toFixed(2)}</div>
               <p className="text-xs text-muted-foreground">
                 From {totalTransactions} transactions
               </p>
@@ -202,7 +202,7 @@ const AdminDashboard = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="font-bold text-success">
-                          ${transaction.amount}
+                          ₦{transaction.amount}
                         </TableCell>
                         <TableCell className="text-sm">
                           {transaction.collector}
