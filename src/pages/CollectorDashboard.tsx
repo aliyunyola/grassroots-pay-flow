@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 const CollectorDashboard = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     payerName: "",
     payerPhone: "",
@@ -24,7 +26,7 @@ const CollectorDashboard = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.payerName || !formData.payerPhone || !formData.amount || !formData.paymentType) {
@@ -36,27 +38,69 @@ const CollectorDashboard = () => {
       return;
     }
 
-    // Create transaction record
-    const transaction = {
-      id: Date.now().toString(),
-      ...formData,
-      timestamp: new Date().toISOString(),
-      collector: localStorage.getItem("userEmail") || "collector@example.com",
-    };
+    setIsSubmitting(true);
 
-    // Save to localStorage (mock database)
-    const existingTransactions = JSON.parse(localStorage.getItem("transactions") || "[]");
-    existingTransactions.push(transaction);
-    localStorage.setItem("transactions", JSON.stringify(existingTransactions));
+    try {
+      // Insert transaction into Supabase
+      const { data, error } = await supabase
+        .from("transactions")
+        .insert([
+          {
+            payer_name: formData.payerName,
+            payer_phone: formData.payerPhone,
+            amount: parseFloat(formData.amount),
+            payment_type: formData.paymentType,
+            description: formData.description,
+            collector: localStorage.getItem("userEmail") || "collector@example.com",
+          }
+        ])
+        .select()
+        .single();
 
-    toast({
-      title: "Payment Recorded Successfully!",
-      description: "SMS sent and receipt ready for printing.",
-    });
+      if (error) throw error;
 
-    // Navigate to receipt page
-    localStorage.setItem("currentReceipt", JSON.stringify(transaction));
-    navigate("/receipt");
+      // Store receipt data for the receipt page (convert to old format for compatibility)
+      const receiptData = {
+        id: data.id,
+        payerName: data.payer_name,
+        payerPhone: data.payer_phone,
+        amount: data.amount.toString(),
+        paymentType: data.payment_type,
+        description: data.description,
+        timestamp: data.created_at,
+        collector: data.collector,
+      };
+      localStorage.setItem("currentReceipt", JSON.stringify(receiptData));
+
+      toast({
+        title: "Payment Recorded Successfully!",
+        description: "SMS sent and receipt ready for printing. Redirecting to receipt...",
+      });
+
+      // Reset form
+      setFormData({
+        payerName: "",
+        payerPhone: "",
+        amount: "",
+        paymentType: "",
+        description: "",
+      });
+
+      // Navigate to receipt page
+      setTimeout(() => {
+        navigate("/receipt");
+      }, 1500);
+
+    } catch (error) {
+      console.error("Error submitting transaction:", error);
+      toast({
+        title: "Error",
+        description: "Failed to record payment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleLogout = () => {

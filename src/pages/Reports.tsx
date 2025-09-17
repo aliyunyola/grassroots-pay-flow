@@ -5,8 +5,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Receipt, TrendingUp, Users, DollarSign, Search, LogOut, User, FileText, TestTube, Calendar } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Download, FileText, Receipt, Calendar, TrendingUp, Users, DollarSign, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 
@@ -17,23 +17,25 @@ interface Transaction {
   amount: number;
   payment_type: string;
   description: string;
-  created_at: string;
   collector: string;
+  created_at: string;
 }
 
-const AdminDashboard = () => {
+const Reports = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
   const [dateFilter, setDateFilter] = useState("");
   const [collectorFilter, setCollectorFilter] = useState("");
   const [paymentTypeFilter, setPaymentTypeFilter] = useState("");
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchTransactions();
-    setupRealtimeSubscription();
   }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [transactions, dateFilter, collectorFilter, paymentTypeFilter]);
 
   const fetchTransactions = async () => {
     try {
@@ -51,88 +53,60 @@ const AdminDashboard = () => {
     }
   };
 
-  const setupRealtimeSubscription = () => {
-    const channel = supabase
-      .channel('schema-db-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'transactions'
-        },
-        (payload) => {
-          console.log('New transaction:', payload);
-          setTransactions(prev => [payload.new as Transaction, ...prev]);
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'transactions'
-        },
-        (payload) => {
-          console.log('Transaction updated:', payload);
-          setTransactions(prev => 
-            prev.map(t => t.id === payload.new.id ? payload.new as Transaction : t)
-          );
-        }
-      )
-      .subscribe();
+  const applyFilters = () => {
+    let filtered = [...transactions];
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    if (dateFilter) {
+      filtered = filtered.filter(t => 
+        format(new Date(t.created_at), "yyyy-MM-dd") === dateFilter
+      );
+    }
+
+    if (collectorFilter) {
+      filtered = filtered.filter(t => 
+        t.collector.toLowerCase().includes(collectorFilter.toLowerCase())
+      );
+    }
+
+    if (paymentTypeFilter) {
+      filtered = filtered.filter(t => t.payment_type === paymentTypeFilter);
+    }
+
+    setFilteredTransactions(filtered);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userEmail");
-    navigate("/");
+  const downloadCSV = () => {
+    const headers = ["Date", "Payer Name", "Phone", "Amount", "Payment Type", "Collector", "Description"];
+    const csvContent = [
+      headers.join(","),
+      ...filteredTransactions.map(t => [
+        format(new Date(t.created_at), "yyyy-MM-dd HH:mm:ss"),
+        `"${t.payer_name}"`,
+        t.payer_phone,
+        t.amount,
+        `"${t.payment_type.replace('-', ' ')}"`,
+        `"${t.collector}"`,
+        `"${t.description || ''}"`
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `community-receipts-${format(new Date(), "yyyy-MM-dd")}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
-  const filteredTransactions = transactions.filter((transaction) => {
-    const matchesSearch = 
-      transaction.payer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      transaction.collector.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      transaction.payment_type.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesDate = !dateFilter || 
-      format(new Date(transaction.created_at), "yyyy-MM-dd") === dateFilter;
-    
-    const matchesCollector = !collectorFilter || 
-      transaction.collector.toLowerCase().includes(collectorFilter.toLowerCase());
-    
-    const matchesPaymentType = !paymentTypeFilter || 
-      transaction.payment_type === paymentTypeFilter;
-
-    return matchesSearch && matchesDate && matchesCollector && matchesPaymentType;
-  });
-
-  const totalAmount = transactions.reduce((sum, t) => sum + Number(t.amount), 0);
-  const totalTransactions = transactions.length;
-  const uniqueCollectors = new Set(transactions.map(t => t.collector)).size;
-
-  const formatDate = (timestamp: string) => {
-    return new Date(timestamp).toLocaleDateString();
+  const downloadPDF = () => {
+    // Simple PDF generation simulation
+    alert("PDF download would generate a formatted report here");
   };
 
-  const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
+  const totalAmount = filteredTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
+  const uniqueCollectors = new Set(filteredTransactions.map(t => t.collector)).size;
+  const uniqueTraders = new Set(filteredTransactions.map(t => t.payer_name)).size;
 
   const getPaymentTypeColor = (type: string) => {
     const colors: { [key: string]: string } = {
@@ -145,49 +119,50 @@ const AdminDashboard = () => {
     return colors[type] || colors.other;
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading reports...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted">
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Receipt className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold">E-Receipts</span>
-            <span className="text-sm text-muted-foreground">Admin Portal</span>
-          </div>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-sm">
-              <User className="h-4 w-4" />
-              <span>{localStorage.getItem("userEmail")}</span>
+            <Link to="/admin">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Dashboard
+              </Button>
+            </Link>
+            <div className="flex items-center space-x-2">
+              <FileText className="h-8 w-8 text-primary" />
+              <span className="text-xl font-bold">Revenue Reports</span>
             </div>
-            <Link to="/reports">
-              <Button variant="outline" size="sm">
-                <FileText className="h-4 w-4 mr-2" />
-                Reports
-              </Button>
-            </Link>
-            <Link to="/testing">
-              <Button variant="outline" size="sm">
-                <TestTube className="h-4 w-4 mr-2" />
-                Test Simulation
-              </Button>
-            </Link>
-            <Link to="/collector">
-              <Button variant="outline" size="sm">
-                Collector View
-              </Button>
-            </Link>
-            <Button variant="outline" size="sm" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
+          </div>
+          <div className="flex space-x-2">
+            <Button variant="outline" onClick={downloadCSV}>
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
+            <Button onClick={downloadPDF}>
+              <FileText className="h-4 w-4 mr-2" />
+              Export PDF
             </Button>
           </div>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        {/* Summary Cards */}
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card className="shadow-md">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
@@ -196,7 +171,7 @@ const AdminDashboard = () => {
             <CardContent>
               <div className="text-2xl font-bold text-success">₦{totalAmount.toFixed(2)}</div>
               <p className="text-xs text-muted-foreground">
-                From {totalTransactions} transactions
+                From {filteredTransactions.length} transactions
               </p>
             </CardContent>
           </Card>
@@ -204,13 +179,11 @@ const AdminDashboard = () => {
           <Card className="shadow-md">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Transactions</CardTitle>
-              <TrendingUp className="h-4 w-4 text-primary" />
+              <Receipt className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalTransactions}</div>
-              <p className="text-xs text-muted-foreground">
-                All time payments
-              </p>
+              <div className="text-2xl font-bold">{filteredTransactions.length}</div>
+              <p className="text-xs text-muted-foreground">Filtered results</p>
             </CardContent>
           </Card>
 
@@ -221,9 +194,18 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{uniqueCollectors}</div>
-              <p className="text-xs text-muted-foreground">
-                Registered collectors
-              </p>
+              <p className="text-xs text-muted-foreground">Unique collectors</p>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Unique Traders</CardTitle>
+              <TrendingUp className="h-4 w-4 text-secondary" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{uniqueTraders}</div>
+              <p className="text-xs text-muted-foreground">Different payers</p>
             </CardContent>
           </Card>
         </div>
@@ -231,23 +213,11 @@ const AdminDashboard = () => {
         {/* Filters */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Filter Transactions</CardTitle>
-            <CardDescription>Filter by date, collector, payment type, or search</CardDescription>
+            <CardTitle>Filter Reports</CardTitle>
+            <CardDescription>Filter transactions by date, collector, or payment type</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Search</label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search transactions..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
+            <div className="grid md:grid-cols-4 gap-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">Date</label>
                 <Input
@@ -259,7 +229,7 @@ const AdminDashboard = () => {
               <div>
                 <label className="text-sm font-medium mb-2 block">Collector</label>
                 <Input
-                  placeholder="Filter by collector..."
+                  placeholder="Search collector..."
                   value={collectorFilter}
                   onChange={(e) => setCollectorFilter(e.target.value)}
                 />
@@ -280,19 +250,19 @@ const AdminDashboard = () => {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-            <div className="flex justify-end mt-4">
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setSearchTerm("");
-                  setDateFilter("");
-                  setCollectorFilter("");
-                  setPaymentTypeFilter("");
-                }}
-              >
-                Clear All Filters
-              </Button>
+              <div className="flex items-end">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setDateFilter("");
+                    setCollectorFilter("");
+                    setPaymentTypeFilter("");
+                  }}
+                  className="w-full"
+                >
+                  Clear Filters
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -300,31 +270,15 @@ const AdminDashboard = () => {
         {/* Transactions Table */}
         <Card className="shadow-lg">
           <CardHeader>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-              <div>
-                <CardTitle className="text-2xl flex items-center gap-2">
-                  Recent Transactions
-                  <Badge variant="outline" className="bg-success/10 text-success">
-                    Real-time
-                  </Badge>
-                </CardTitle>
-                <CardDescription>
-                  Live updates of payment activities across your community ({filteredTransactions.length} of {totalTransactions} shown)
-                </CardDescription>
-              </div>
-            </div>
+            <CardTitle>Transaction Details</CardTitle>
+            <CardDescription>Detailed view of all transactions matching your filters</CardDescription>
           </CardHeader>
           <CardContent>
             {filteredTransactions.length === 0 ? (
               <div className="text-center py-8">
                 <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No Transactions Found</h3>
-                <p className="text-muted-foreground mb-4">
-                  {searchTerm ? "No transactions match your search." : "Start by recording your first payment."}
-                </p>
-                <Link to="/collector">
-                  <Button>Record Payment</Button>
-                </Link>
+                <p className="text-muted-foreground">Try adjusting your filters or check back later.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -336,14 +290,14 @@ const AdminDashboard = () => {
                       <TableHead>Type</TableHead>
                       <TableHead>Amount</TableHead>
                       <TableHead>Collector</TableHead>
-                      <TableHead>Time</TableHead>
+                      <TableHead>Description</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredTransactions.slice(0, 50).map((transaction) => (
+                    {filteredTransactions.map((transaction) => (
                       <TableRow key={transaction.id}>
                         <TableCell className="font-medium">
-                          {formatDate(transaction.created_at)}
+                          {format(new Date(transaction.created_at), "MMM dd, yyyy HH:mm")}
                         </TableCell>
                         <TableCell>
                           <div>
@@ -362,8 +316,8 @@ const AdminDashboard = () => {
                         <TableCell className="text-sm">
                           {transaction.collector}
                         </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {formatTime(transaction.created_at)}
+                        <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">
+                          {transaction.description || "—"}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -378,4 +332,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default Reports;

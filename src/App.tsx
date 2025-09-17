@@ -9,6 +9,8 @@ import Login from "./pages/Login";
 import CollectorDashboard from "./pages/CollectorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import Receipt from "./pages/Receipt";
+import Reports from "./pages/Reports";
+import TestingSimulation from "./pages/TestingSimulation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +27,8 @@ const App = () => (
           <Route path="/collector" element={<CollectorDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/receipt" element={<Receipt />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/testing" element={<TestingSimulation />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
