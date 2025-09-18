@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Receipt, TrendingUp, Users, DollarSign, Search, LogOut, User, FileText, TestTube, Calendar } from "lucide-react";
+import { Receipt, TrendingUp, Users, DollarSign, Search, LogOut, User, FileText, TestTube, Calendar, Shield, AlertTriangle, MessageSquare } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -164,6 +164,24 @@ const AdminDashboard = () => {
               <Button variant="outline" size="sm">
                 <FileText className="h-4 w-4 mr-2" />
                 Reports
+              </Button>
+            </Link>
+            <Link to="/fraud-detection">
+              <Button variant="outline" size="sm">
+                <Shield className="h-4 w-4 mr-2" />
+                Fraud Detection
+              </Button>
+            </Link>
+            <Link to="/compliance">
+              <Button variant="outline" size="sm">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Compliance
+              </Button>
+            </Link>
+            <Link to="/pilot">
+              <Button variant="outline" size="sm">
+                <AlertTriangle className="h-4 w-4 mr-2" />
+                Pilot Simulation
               </Button>
             </Link>
             <Link to="/testing">
