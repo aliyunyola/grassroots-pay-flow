@@ -105,7 +105,7 @@ const AdminDashboard = () => {
     const matchesCollector = !collectorFilter || 
       transaction.collector.toLowerCase().includes(collectorFilter.toLowerCase());
     
-    const matchesPaymentType = !paymentTypeFilter || 
+    const matchesPaymentType = !paymentTypeFilter || paymentTypeFilter === "all" || 
       transaction.payment_type === paymentTypeFilter;
 
     return matchesSearch && matchesDate && matchesCollector && matchesPaymentType;
@@ -271,7 +271,7 @@ const AdminDashboard = () => {
                     <SelectValue placeholder="All types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All types</SelectItem>
+                    <SelectItem value="all">All types</SelectItem>
                     <SelectItem value="school-fees">School Fees</SelectItem>
                     <SelectItem value="community-levy">Community Levy</SelectItem>
                     <SelectItem value="development-fund">Development Fund</SelectItem>
@@ -288,7 +288,7 @@ const AdminDashboard = () => {
                   setSearchTerm("");
                   setDateFilter("");
                   setCollectorFilter("");
-                  setPaymentTypeFilter("");
+                  setPaymentTypeFilter("all");
                 }}
               >
                 Clear All Filters

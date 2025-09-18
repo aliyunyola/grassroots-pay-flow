@@ -68,7 +68,7 @@ const Reports = () => {
       );
     }
 
-    if (paymentTypeFilter) {
+    if (paymentTypeFilter && paymentTypeFilter !== "all") {
       filtered = filtered.filter(t => t.payment_type === paymentTypeFilter);
     }
 
@@ -241,7 +241,7 @@ const Reports = () => {
                     <SelectValue placeholder="All types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All types</SelectItem>
+                    <SelectItem value="all">All types</SelectItem>
                     <SelectItem value="school-fees">School Fees</SelectItem>
                     <SelectItem value="community-levy">Community Levy</SelectItem>
                     <SelectItem value="development-fund">Development Fund</SelectItem>
@@ -256,7 +256,7 @@ const Reports = () => {
                   onClick={() => {
                     setDateFilter("");
                     setCollectorFilter("");
-                    setPaymentTypeFilter("");
+                    setPaymentTypeFilter("all");
                   }}
                   className="w-full"
                 >
