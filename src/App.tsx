@@ -11,6 +11,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Receipt from "./pages/Receipt";
 import Reports from "./pages/Reports";
 import TestingSimulation from "./pages/TestingSimulation";
+import FraudDetection from "./pages/FraudDetection";
+import ComplianceReminder from "./pages/ComplianceReminder";
+import PilotSimulation from "./pages/PilotSimulation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +32,9 @@ const App = () => (
           <Route path="/receipt" element={<Receipt />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/testing" element={<TestingSimulation />} />
+          <Route path="/fraud-detection" element={<FraudDetection />} />
+          <Route path="/compliance" element={<ComplianceReminder />} />
+          <Route path="/pilot" element={<PilotSimulation />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
