@@ -235,12 +235,6 @@ const CollectorDashboard = () => {
                   <Printer className="h-4 w-4 mr-2" />
                   Print Last Receipt
                 </Button>
-                <Link to="/admin">
-                  <Button variant="outline" className="w-full justify-start">
-                    <User className="h-4 w-4 mr-2" />
-                    View Admin Dashboard
-                  </Button>
-                </Link>
               </CardContent>
             </Card>
 
