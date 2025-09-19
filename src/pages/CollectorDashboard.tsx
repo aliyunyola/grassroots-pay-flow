@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Receipt, Send, Printer, User, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import paysureLogo from "@/assets/paysure-logo.png";
 
 const CollectorDashboard = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -114,10 +115,12 @@ const CollectorDashboard = () => {
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Receipt className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold">E-Receipts</span>
-            <span className="text-sm text-muted-foreground">Collector Portal</span>
+          <div className="flex items-center space-x-3">
+            <img src={paysureLogo} alt="PaySure AI" className="h-8 w-8" />
+            <div>
+              <span className="text-xl font-bold">PaySure AI</span>
+              <span className="text-sm text-muted-foreground block">Secure Receipts, Smarter Revenue</span>
+            </div>
           </div>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-sm">

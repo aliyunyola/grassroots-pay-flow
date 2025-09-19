@@ -7,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Receipt, User, Shield } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import paysureLogo from "@/assets/paysure-logo.png";
 
 const Login = () => {
   const [role, setRole] = useState("collector");
@@ -50,9 +51,12 @@ const Login = () => {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center space-x-2 text-white hover:opacity-80 transition-opacity">
-            <Receipt className="h-8 w-8" />
-            <span className="text-2xl font-bold">E-Receipts</span>
+          <Link to="/" className="inline-flex items-center space-x-3 text-white hover:opacity-80 transition-opacity">
+            <img src={paysureLogo} alt="PaySure AI" className="h-10 w-10" />
+            <div>
+              <span className="text-2xl font-bold">PaySure AI</span>
+              <p className="text-sm opacity-90">Secure Receipts, Smarter Revenue</p>
+            </div>
           </Link>
         </div>
 

@@ -17,21 +17,21 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 27%;
 
-    /* Professional blue theme */
-    --primary: 217 91% 60%;
+    /* PaySure AI Professional Navy & Emerald Theme */
+    --primary: 237 68% 31%; /* Navy Blue #1A237E */
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 91% 55%;
+    --primary-hover: 237 68% 26%;
 
     --secondary: 210 40% 96%;
-    --secondary-foreground: 215 25% 27%;
+    --secondary-foreground: 237 68% 31%;
 
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
 
-    --accent: 142 76% 36%;
+    --accent: 145 60% 32%; /* Emerald Green #2E7D32 */
     --accent-foreground: 0 0% 100%;
 
-    --success: 142 76% 36%;
+    --success: 145 60% 32%; /* Emerald Green #2E7D32 */
     --success-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -44,10 +44,10 @@ All colors MUST be HSL.
     --input: 220 13% 91%;
     --ring: 217 91% 60%;
 
-    /* Custom gradient tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(142 76% 36%) 100%);
+    /* PaySure AI Custom gradient tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(237 68% 31%), hsl(237 68% 41%));
+    --gradient-success: linear-gradient(135deg, hsl(145 60% 32%), hsl(145 60% 42%));
+    --gradient-hero: linear-gradient(135deg, hsl(237 68% 31%) 0%, hsl(145 60% 32%) 100%);
     
     /* Shadow tokens */
     --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);

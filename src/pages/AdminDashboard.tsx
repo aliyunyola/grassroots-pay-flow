@@ -9,6 +9,7 @@ import { Receipt, TrendingUp, Users, DollarSign, Search, LogOut, User, FileText,
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import paysureLogo from "@/assets/paysure-logo.png";
 
 interface Transaction {
   id: string;
@@ -150,10 +151,12 @@ const AdminDashboard = () => {
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Receipt className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold">E-Receipts</span>
-            <span className="text-sm text-muted-foreground">Admin Portal</span>
+          <div className="flex items-center space-x-3">
+            <img src={paysureLogo} alt="PaySure AI" className="h-8 w-8" />
+            <div>
+              <span className="text-xl font-bold">PaySure AI</span>
+              <span className="text-sm text-muted-foreground block">Secure Receipts, Smarter Revenue</span>
+            </div>
           </div>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-sm">

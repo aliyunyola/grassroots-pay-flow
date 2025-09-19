@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Receipt, TrendingUp, Users, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import paysureLogo from "@/assets/paysure-logo.png";
 
 const Landing = () => {
   return (
@@ -9,9 +10,9 @@ const Landing = () => {
       {/* Navigation */}
       <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Receipt className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold">E-Receipts</span>
+          <div className="flex items-center space-x-3">
+            <img src={paysureLogo} alt="PaySure AI" className="h-10 w-10" />
+            <span className="text-xl font-bold">PaySure AI</span>
           </div>
           <Link to="/login">
             <Button>Login</Button>
@@ -23,12 +24,12 @@ const Landing = () => {
       <section className="py-20 bg-gradient-hero text-white">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Transparent Community
+            Secure Receipts,
             <br />
-            Revenue Collection
+            Smarter Revenue
           </h1>
           <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto">
-            Modern platform for grassroots revenue and school fee collection with instant receipts, SMS notifications, and complete transparency.
+            AI-powered platform for secure revenue collection with instant receipts, fraud detection, and complete transparency.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/login">
@@ -49,10 +50,10 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Everything You Need for Modern Revenue Collection
+              Everything You Need for Secure Revenue Collection
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Streamline your community's financial processes with our comprehensive platform.
+              AI-powered security and transparency for your community's financial processes.
             </p>
           </div>
 
@@ -72,11 +73,11 @@ const Landing = () => {
             <Card className="text-center shadow-md hover:shadow-lg transition-shadow">
               <CardHeader>
                 <Shield className="h-12 w-12 text-success mx-auto mb-4" />
-                <CardTitle>SMS Notifications</CardTitle>
+                <CardTitle>AI Fraud Detection</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription>
-                  Automatic SMS confirmations sent to payers for every transaction.
+                  Smart AI algorithms detect suspicious transactions and prevent fraud.
                 </CardDescription>
               </CardContent>
             </Card>
@@ -129,12 +130,12 @@ const Landing = () => {
       {/* Footer */}
       <footer className="py-12 border-t">
         <div className="container mx-auto px-4 text-center">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <Receipt className="h-6 w-6 text-primary" />
-            <span className="text-lg font-semibold">E-Receipts</span>
+          <div className="flex items-center justify-center space-x-3 mb-4">
+            <img src={paysureLogo} alt="PaySure AI" className="h-8 w-8" />
+            <span className="text-lg font-semibold">PaySure AI</span>
           </div>
           <p className="text-muted-foreground">
-            © 2024 E-Receipts. All rights reserved.
+            © 2025 PaySure AI. All rights reserved.
           </p>
         </div>
       </footer>
